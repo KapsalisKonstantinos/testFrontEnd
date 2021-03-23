@@ -18,6 +18,9 @@ export class EmployeeComponent implements OnInit {
   company: Company = {};
   edit = false;
   editEmployeeId: number;
+  listView = false;
+  employeeList: string[];
+  averageSalary: string;
 
   employeeForm = this.formBuilder.group({
     name: new FormControl(),
@@ -35,6 +38,10 @@ export class EmployeeComponent implements OnInit {
               private companyService: CompanyService) { }
 
   ngOnInit(): void {
+    this.refresh();
+  }
+
+  refresh(){
     const loadData = new Array<Observable<Employee[]>>();
     let obs: Observable<any>;
 
@@ -50,12 +57,20 @@ export class EmployeeComponent implements OnInit {
 
     obs = this.employeeService.get()
       .pipe(map(data => {
-        console.log(data);
         this.dataSource.data = data;
       }, (error: any) => {
         console.log(error);
       }));
     loadData.push(obs);
+
+    obs = this.employeeService.getAvg()
+      .pipe(map(data => {
+        this.averageSalary = data.toPrecision(6);
+      }, (error: any) => {
+        console.log(error);
+      }));
+    loadData.push(obs);
+
     concat(...loadData).subscribe();
   }
 
@@ -76,6 +91,20 @@ export class EmployeeComponent implements OnInit {
     }
 
     this.employeeForm.reset();
+    this.refresh();
+  }
+
+  changeView (){
+    if(!this.listView) {
+      this.employeeService.getList().subscribe( res => {
+        this.employeeList = res;
+        this.listView = !this.listView
+      })
+    } else {
+      this.employeeService.get().subscribe( res => {
+        this.listView = !this.listView
+      })
+    }
   }
 
   /**
@@ -98,6 +127,7 @@ export class EmployeeComponent implements OnInit {
    */
   deleteEmployee(employee: Employee) {
     this.employeeService.delete(employee.id).subscribe();
+    this.refresh();
   }
 
   /**
