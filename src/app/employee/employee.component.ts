@@ -1,6 +1,7 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
-import { FormBuilder, FormControl } from '@angular/forms';
+import { FormBuilder, FormControl, Validators } from '@angular/forms';
 import { MatTableDataSource } from '@angular/material/table';
+import { cpuUsage } from 'process';
 import { concat, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { CompanyService } from '../services/company.service';
@@ -23,11 +24,11 @@ export class EmployeeComponent implements OnInit {
   averageSalary: string;
 
   employeeForm = this.formBuilder.group({
-    name: new FormControl(),
-    surname: new FormControl(),
-    email: new FormControl(),
-    address: new FormControl(),
-    salary: new FormControl(),
+    name: new FormControl(null, [Validators.required]),
+    surname: new FormControl(null, [Validators.required]),
+    email: new FormControl(null, [Validators.required]),
+    address: new FormControl(null, [Validators.required]),
+    salary: new FormControl(null, [Validators.required]),
     company_id: new FormControl()
   });
 
@@ -47,7 +48,6 @@ export class EmployeeComponent implements OnInit {
 
     obs = this.companyService.get()
       .pipe(map(data => {
-        console.log(data);
         this.company.name = data[0].name;
         this.company.id = data[0].id;
       }, (error: any) => {
@@ -63,9 +63,21 @@ export class EmployeeComponent implements OnInit {
       }));
     loadData.push(obs);
 
+    obs = this.employeeService.getList()
+      .pipe(map(data => {
+        this.employeeList = data;
+      }, (error: any) => {
+        console.log(error);
+      }));
+    loadData.push(obs);
+
     obs = this.employeeService.getAvg()
       .pipe(map(data => {
-        this.averageSalary = data.toPrecision(6);
+        if(data===0.0) {
+          this.averageSalary = '-'
+        } else {
+          this.averageSalary = data.toLocaleString();
+        }
       }, (error: any) => {
         console.log(error);
       }));
@@ -92,6 +104,11 @@ export class EmployeeComponent implements OnInit {
 
     this.employeeForm.reset();
     this.refresh();
+  }
+
+  cancel() {
+    this.employeeForm.reset();
+    this.edit = false;
   }
 
   changeView (){

@@ -14,6 +14,10 @@ export class CompanyService {
 
   constructor(private http: HttpClient) { }
 
+  /**
+   * Get All Companies
+   * @returns Company[]
+   */
   get(): Observable<Company[]> {
     this.requestOptions.headers = this.requestOptions.headers.delete('Content-type');
     this.requestOptions.headers = this.requestOptions.headers.append('Content-type', 'application/json');

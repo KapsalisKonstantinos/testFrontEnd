@@ -3,33 +3,35 @@
     <h2>{{company.name}} Employee Management</h2>
   </div>
   <div fxFlex="50" id="form">
-    <form [formGroup]="employeeForm" (ngSubmit)="submit()">
+    <form [formGroup]="employeeForm">
       <mat-form-field>
         <mat-label>Name</mat-label>
-        <input class="form-control" matInput placeholder="Name" formControlName="name">
+        <input class="form-control" matInput placeholder="Name" formControlName="name" required>
       </mat-form-field>
       <br>
       <mat-form-field>
         <mat-label>Surname</mat-label>
-        <input class="form-control" matInput placeholder="Surname" formControlName="surname">
+        <input class="form-control" matInput placeholder="Surname" formControlName="surname" required>
       </mat-form-field>
       <br>
       <mat-form-field>
         <mat-label>Email</mat-label>
-        <input class="form-control" matInput placeholder="email" formControlName="email" type="email">
+        <input class="form-control" matInput placeholder="email" formControlName="email" type="email" required>
       </mat-form-field>
       <br>
       <mat-form-field>
         <mat-label>Address</mat-label>
-        <input class="form-control" matInput placeholder="Address" formControlName="address" type="text">
+        <input class="form-control" matInput placeholder="Address" formControlName="address" type="text" required>
       </mat-form-field>
       <br>
       <mat-form-field>
         <mat-label>Salary</mat-label>
-        <input class="form-control" matInput placeholder="Salary" formControlName="salary" type="number">
+        <input class="form-control" matInput placeholder="Salary" formControlName="salary" type="number" required>
       </mat-form-field>
       <br>
-      <button mat-raised-button type="submit">Save</button>
+      <button id="formButton" mat-raised-button *ngIf="!edit" (click)="submit()" [disabled]="!employeeForm.valid">Save</button>
+      <button id="formButton" mat-raised-button *ngIf="edit" (click)="submit()" [disabled]="!employeeForm.valid">Update</button>
+      <button id="formButton" mat-raised-button (click)="cancel()">Cancel</button>
     </form>
   </div>
   <button mat-raised-button type="button" (click)="changeView()">Detail View</button>
